@@ -1,0 +1,72 @@
+CREATE DATABASE gestionordi;
+
+
+CREATE TABLE ordinateur (
+  id_ordinateur INT NOT NULL AUTO_INCREMENT,
+  nom VARCHAR(45) DEFAULT NULL,
+  marque VARCHAR(45) DEFAULT NULL,
+  modele VARCHAR(45) DEFAULT NULL,
+  numero_serie VARCHAR(45) DEFAULT NULL,
+  etat INT DEFAULT NULL,
+  PRIMARY KEY (id_ordinateur)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE armoire (
+  id_armoire INT NOT NULL AUTO_INCREMENT,
+  nom_armoire VARCHAR(45) DEFAULT NULL,
+  emplacement VARCHAR(45) DEFAULT NULL,
+  description VARCHAR(255) DEFAULT NULL,
+  PRIMARY KEY (id_armoire)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE position (
+  id_position INT NOT NULL AUTO_INCREMENT,
+  id_ordinateur INT NOT NULL,
+  id_armoire INT NOT NULL,
+  rangee VARCHAR(45) DEFAULT NULL,
+  colonne VARCHAR(45) DEFAULT NULL,
+  date_ajout DATETIME DEFAULT NULL,
+  PRIMARY KEY (id_position),
+  FOREIGN KEY (id_ordinateur) REFERENCES ordinateur(id_ordinateur),
+  FOREIGN KEY (id_armoire) REFERENCES armoire(id_armoire)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE etudiant (
+  id_etudiant INT NOT NULL AUTO_INCREMENT,
+  nom VARCHAR(45) DEFAULT NULL,
+  prenom VARCHAR(45) DEFAULT NULL,
+  email VARCHAR(45) DEFAULT NULL,
+  telephone VARCHAR(45) DEFAULT NULL,
+  PRIMARY KEY (id_etudiant)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE tag (
+  id_tag INT NOT NULL AUTO_INCREMENT,
+  rfid_code VARCHAR(255) DEFAULT NULL,
+  date DATETIME DEFAULT NULL,
+  PRIMARY KEY (id_tag)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE presence (
+  id_presence INT NOT NULL AUTO_INCREMENT,
+  id_ordinateur INT NOT NULL,
+  id_etudiant INT NOT NULL,
+  id_tag INT DEFAULT NULL,
+  date_emprunt DATETIME DEFAULT NULL,
+  date_retour DATETIME DEFAULT NULL,
+  etat_retour INT DEFAULT NULL,
+  PRIMARY KEY (id_presence),
+  FOREIGN KEY (id_ordinateur) REFERENCES ordinateur(id_ordinateur),
+  FOREIGN KEY (id_etudiant) REFERENCES etudiant(id_etudiant),
+  FOREIGN KEY (id_tag) REFERENCES tag(id_tag)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE maintenance (
+  id_maintenance INT NOT NULL AUTO_INCREMENT,
+  id_ordinateur INT NOT NULL,
+  description VARCHAR(255) DEFAULT NULL,
+  date_maintenance DATETIME DEFAULT NULL,
+  PRIMARY KEY (id_maintenance),
+  FOREIGN KEY (id_ordinateur) REFERENCES ordinateur(id_ordinateur)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
