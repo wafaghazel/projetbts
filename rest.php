@@ -1,7 +1,7 @@
 <?php
 
 //CONNEXION A LA BDD
-$pdo = new PDO('mysql:host=localhost;dbname=gestiontel;charset=utf8','wafa','wafa');
+$pdo = new PDO('mysql:host=localhost;dbname=test;charset=utf8','lola','lola');
 
 //ANALYSER L'URL
 $url=$_SERVER['PATH_INFO'] ?? '/';
@@ -20,12 +20,12 @@ echo $methode;
 // PUT -> modifier des donnees de la bdd
 
 // TABLE CIBLE
-$table = $tab_url[1]; //?? '';
+$table = $tab_url[1];  // ?? '';
 
 // ID (si présent)
-$id = isset($tab_url[1]) ? intval($tab_url[1]) : null;
+$id = isset($tab_url[2]) ? intval($tab_url[2]) : null;
 
-// definir la cle primaire
+//DEFINIR LA CLE PRIMAIRE
 $primarykey = "id_" . $table;
 
 // FONCTIONS CRUD SIMPLIFIÉES
@@ -48,12 +48,13 @@ if ($methode == 'POST') {
 if ($methode == 'PUT' && $id) {
     $data = json_decode(file_get_contents('php://input'), true);
     $updates = implode('=?, ', array_keys($data)) . '=?';
-    $stmt = $pdo->prepare("UPDATE $table SET $updates WHERE id_{$table} = ?");
+    $stmt = $pdo->prepare("UPDATE $table SET $updates WHERE $primarykey = ?");
     echo json_encode(['success' => $stmt->execute([...array_values($data), $id])]);
 }
 
 if ($methode == 'DELETE' && $id) {
-    $stmt = $pdo->prepare("DELETE FROM $table WHERE id_{$table} = ?");
+    $stmt = $pdo->prepare("DELETE FROM $table WHERE $primarykey = ?");
+    $stmt->execute($id ? [$id] : []);
     echo json_encode(['success' => $stmt->execute([$id])]);
 }
 
