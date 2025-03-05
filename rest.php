@@ -1,17 +1,17 @@
 <?php
 
 //CONNEXION A LA BDD
-$pdo = new PDO('mysql:host=localhost;dbname=test;charset=utf8','lola','lola');
+$pdo = new PDO('mysql:host=localhost;dbname=gestiontel;charset=utf8','wafa','wafa');
 
 //ANALYSER L'URL
 $url=$_SERVER['PATH_INFO'] ?? '/';
-echo $url;
+//echo $url;
 $tab_url=explode('/',$url);
-echo "<pre>";print_r($tab_url);echo "</pre>";
+//echo "<pre>";print_r($tab_url);echo "</pre>";
 
 //EXTRAIRE LA METHODE
 $methode=$_SERVER['REQUEST_METHOD'];
-echo $methode;
+//echo $methode;
 
 // GET -> recuperer des donnees de la bdd
 
@@ -30,7 +30,7 @@ $primarykey = "id_" . $table;
 
 // FONCTIONS CRUD SIMPLIFIÉES
 if ($methode == 'GET') {
-    $requete = "SELECT * FROM $table WHERE $primarykey = ?";
+    //$requete = "SELECT * FROM $table WHERE $primarykey = ?";
     //echo $requete;
     $stmt = $id ? $pdo->prepare("SELECT * FROM $table WHERE $primarykey = ?") : $pdo->prepare("SELECT * FROM $table");
     $stmt->execute($id ? [$id] : []);
