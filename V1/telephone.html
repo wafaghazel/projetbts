@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestion des Téléphones</title>
+  <style>
+    /* Style de base pour toute la page */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    /* Style du menu de navigation */
+    nav a {
+      margin-right: 15px;
+      text-decoration: none;
+      color: #007BFF;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    /* Style du tableau */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    .message {
+      margin-top: 10px;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Menu de navigation vers les autres pages -->
+  <nav>
+    <a href="telephone.html">Téléphones</a>
+    <a href="utilisateur.html">Utilisateurs</a>
+    <a href="attribution.html">Attributions</a>
+    <a href="historique.html">Historique</a>
+  </nav>
+
+  <hr>
+
+  <!-- Titre principal de la page -->
+  <h1>Téléphones détectés</h1>
+
+  <!-- Petit message d'information -->
+  <p class="message">Les téléphones affichés ici proviennent du système RFID.</p>
+
+  <!-- Tableau des téléphones -->
+  <table id="tableau-telephones">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Modèle</th>
+        <th>Numéro</th>
+        <th>Statut</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Le contenu sera rempli automatiquement avec JavaScript -->
+    </tbody>
+  </table>
+
+  <script>
+    // Cette fonction est exécutée automatiquement quand la page est chargée
+    window.onload = function() {
+      chargerTelephones(); // On appelle la fonction pour afficher les téléphones
+    };
+
+    // Fonction pour récupérer et afficher les téléphones depuis l'API
+    function chargerTelephones() {
+      // Appel à l'API PHP (modifie l'URL selon ton projet)
+      fetch('http://localhost/api/telephones') // ← à adapter à l'adresse de ton API
+        .then(function(response) {
+          return response.json(); // transforme la réponse en format JSON
+        })
+        .then(function(donnees) {
+          // On sélectionne le corps du tableau (la partie <tbody>)
+          let tableau = document.getElementById('tableau-telephones').getElementsByTagName('tbody')[0];
+          tableau.innerHTML = ''; // On vide le tableau pour ne pas dupliquer
+
+          // Pour chaque téléphone dans la liste récupérée
+          donnees.forEach(function(telephone) {
+            let ligne = tableau.insertRow(); // On crée une nouvelle ligne
+
+            // On ajoute chaque information dans une cellule
+            ligne.insertCell().textContent = telephone.id;
+            ligne.insertCell().textContent = telephone.modele;
+            ligne.insertCell().textContent = telephone.numero;
+            ligne.insertCell().textContent = telephone.statut;
+
+            // On ajoute un bouton d'action (ex : supprimer, plus tard)
+            let cellAction = ligne.insertCell();
+            cellAction.innerHTML = '<button>Supprimer</button>'; // fonction non encore active
+          });
+        })
+        .catch(function(erreur) {
+          console.error('Erreur :', erreur); // Affiche une erreur si la requête échoue
+        });
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestion des Utilisateurs</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    nav a {
+      margin-right: 15px;
+      text-decoration: none;
+      color: #007BFF;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    .message {
+      margin-top: 10px;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Menu de navigation -->
+  <nav>
+    <a href="telephone.html">Téléphones</a>
+    <a href="utilisateur.html">Utilisateurs</a>
+    <a href="attribution.html">Attributions</a>
+    <a href="historique.html">Historique</a>
+  </nav>
+
+  <hr>
+
+  <h1>Liste des utilisateurs</h1>
+
+  <p class="message">Les utilisateurs affichés ici sont récupérés depuis l'API PHP.</p>
+
+  <!-- Tableau des utilisateurs -->
+  <table id="tableau-utilisateurs">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nom</th>
+        <th>Prénom</th>
+        <th>Service</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Les données seront ajoutées ici avec JavaScript -->
+    </tbody>
+  </table>
+
+  <script>
+    // Quand la page est chargée, on récupère les utilisateurs
+    window.onload = function() {
+      chargerUtilisateurs();
+    };
+
+    // Fonction pour récupérer la liste des utilisateurs depuis l’API PHP
+    function chargerUtilisateurs() {
+      fetch('http://localhost/api/utilisateurs') // ← adapte l’URL à ton API
+        .then(function(response) {
+          return response.json(); // transforme la réponse en JSON
+        })
+        .then(function(donnees) {
+          let tableau = document.getElementById('tableau-utilisateurs').getElementsByTagName('tbody')[0];
+          tableau.innerHTML = ''; // on vide le tableau
+
+          // Pour chaque utilisateur reçu, on crée une ligne
+          donnees.forEach(function(utilisateur) {
+            let ligne = tableau.insertRow();
+
+            // Colonnes : ID, Nom, Prénom, Service
+            ligne.insertCell().textContent = utilisateur.id;
+            ligne.insertCell().textContent = utilisateur.nom;
+            ligne.insertCell().textContent = utilisateur.prenom;
+            ligne.insertCell().textContent = utilisateur.service;
+
+            // Dernière colonne : bouton action (à programmer plus tard)
+            let cellAction = ligne.insertCell();
+            cellAction.innerHTML = '<button>Supprimer</button>'; // bouton non actif pour l’instant
+          });
+        })
+        .catch(function(erreur) {
+          console.error('Erreur :', erreur);
+        });
+    }
+  </script>
+
+</body>
+</html>
