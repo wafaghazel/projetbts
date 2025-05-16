@@ -1,11 +1,15 @@
 <?php
-$ip = $_POST['ip'] ?? '192.168.1.116';
-$port = $_POST['port'] ?? 9090;
-$hexInput = $_POST['hex'] ?? '';
+// Initialisation des variables
+$mode = $_POST['mode'] ?? 'client';
+$protocol = 'tcp'; // UDP supprimé, forcé à TCP
+$ip = $_POST['ip'] ?? '192.168.1.100';
+$port = $_POST['port'] ?? 12345;
+$hexMode = isset($_POST['hex']);
+$messageInput = $_POST['message'] ?? '';
 $output = '';
 
-if (!empty($hexInput)) {
-    $message = hex2bin($hexInput);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $mode === 'client') {
+    $message = $hexMode ? hex2bin($messageInput) : $messageInput;
 
     $sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
     if (!$sock) {
@@ -14,19 +18,15 @@ if (!empty($hexInput)) {
         $output = "Erreur connexion : " . socket_strerror(socket_last_error($sock));
     } else {
         socket_send($sock, $message, strlen($message), 0);
-        $output = "Connecté au serveur\n";
+        $output .= "Connecté au serveur\n";
 
-        // Réception boucle simple
-        while (true) {
-            $buf = '';
-            $bytes = @socket_recv($sock, $buf, 1024, MSG_DONTWAIT);
-            if ($bytes > 0) {
-                $output .= strtoupper(bin2hex($buf)) . "\n";
-            }
-            usleep(200000); // 200 ms pour ne pas surcharger
-            if (connection_aborted()) break;
+        $buf = '';
+        $bytes = socket_recv($sock, $buf, 1024, MSG_WAITALL);
+        if ($bytes > 0) {
+            $output .= $hexMode ? strtoupper(bin2hex($buf)) : $buf;
+        } else {
+            $output .= "Aucune donnée reçue.";
         }
-
         socket_close($sock);
     }
 }
@@ -36,29 +36,38 @@ if (!empty($hexInput)) {
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Client RFID TCP</title>
+  <title>Client et Serveur V5 (Web)</title>
   <style>
-    body { font-family: Arial; background: #f0f8ff; padding: 20px; }
-    textarea { width: 100%; height: 300px; margin-top: 10px; font-family: monospace; }
-    input, button { margin: 5px 0; padding: 8px; }
-    .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
+    body { font-family: Arial; background: #f1f1f1; padding: 20px; }
+    .box { background: #fff; padding: 20px; border-radius: 8px; max-width: 500px; margin: auto; box-shadow: 0 0 10px #ccc; }
+    input, button, textarea { width: 100%; padding: 8px; margin-top: 8px; }
+    label { display: block; margin-top: 10px; }
+    .inline { display: inline-block; margin-right: 10px; }
   </style>
 </head>
 <body>
-<div class="container">
-  <h2>Client RFID TCP</h2>
+<div class="box">
+  <h3>Client RFID</h3>
   <form method="post">
-    <label>IP :</label>
-    <input type="text" name="ip" value="<?= htmlspecialchars($ip) ?>"><br>
-    <label>Port :</label>
-    <input type="number" name="port" value="<?= htmlspecialchars($port) ?>"><br>
-    <label>Trame hexadécimale :</label>
-    <input type="text" name="hex" value="<?= htmlspecialchars($hexInput) ?>"><br>
-    <button type="submit">Connexion + Envoi</button>
+    <div>
+      <label class="inline"><input type="radio" name="protocol" value="tcp" checked disabled> TCP</label>
+      <label class="inline"><input type="checkbox" name="hex" <?= $hexMode ? 'checked' : '' ?>> Mode hexadécimal</label>
+    </div>
+    <div>
+      <label class="inline"><input type="radio" name="mode" value="serveur" disabled> Serveur</label>
+      <label class="inline"><input type="radio" name="mode" value="client" checked> Client</label>
+    </div>
+    <label>IP</label>
+    <input type="text" name="ip" value="<?= htmlspecialchars($ip) ?>">
+    <label>Port</label>
+    <input type="number" name="port" value="<?= htmlspecialchars($port) ?>">
+    <label>Votre message...</label>
+    <input type="text" name="message" value="<?= htmlspecialchars($messageInput) ?>">
+    <button type="submit">Connexion</button>
+    <button type="submit">Envoi</button>
   </form>
-
-  <label>Trames reçues :</label>
-  <textarea readonly><?= htmlspecialchars($output) ?></textarea>
+  <label>Réponse :</label>
+  <textarea readonly rows="10"><?= htmlspecialchars($output) ?></textarea>
 </div>
 </body>
 </html>
